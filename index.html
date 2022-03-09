@@ -85,7 +85,10 @@
 
 
         <v-row>
-          <v-col></v-col>
+          <v-col>
+            <!-- {{ moment().format('MMMM Do YYYY, h:mm:ss a') }} -->
+            <!-- <span>{{ new Date() | moment("YYYY") }}</span> -->
+          </v-col>
         </v-row>
 
         <v-row>
@@ -97,14 +100,13 @@
                     <th>日期</th>
                     <th>項目</th>
                     <th>金額</th>
-                    <th>id</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(obj,idx) in spends">
                     <td>
-                      <v-badge :color="getColor(obj.date)" :content=obj.date>
-
+                      <v-badge :color="getColor(obj.date)" :content=getDate(obj.date)>
                       </v-badge>
                     </td>
                     <td>{{obj.title}}</td>
@@ -118,14 +120,6 @@
             </v-simple-table>
           </v-col>
         </v-row>
-
-
-
-
-
-
-
-
       </div>
 
 
@@ -136,6 +130,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-moment/4.1.0/vue-moment.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-auth.js"></script>
@@ -143,41 +138,36 @@
   <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-firestore.js"></script>
   <script>
     var config = {
-
-      apiKey: "AIzaSyDE0_fNOH_DJGCm8mH71Ia1uJ9XwLqb6Fg",
-      authDomain: "wedding-64c7a.firebaseapp.com",
-      projectId: "wedding-64c7a",
+      apiKey: "AIzaSyClLeHQJMt3BzbrK_AHpWeq0nlqzY2r5ik",
+      authDomain: "money-39797.firebaseapp.com",
+      projectId: "money-39797",
     };
+
     firebase.initializeApp(config);
-
-    // make auth and firestore references
-
-
-
-
-
-
 
     const db = firebase.firestore();
 
-
     db.settings({ timestampsInSnapshots: true });
-
-
-
-
 
     new Vue({
       el: '#app',
-      vuetify: new Vuetify(),
+      vuetify: new Vuetify(),     
       methods: {
-        getColor(date){
+        getColor(date) {
           let color = 'blue-grey'
-          if(date=='6')
-           color = 'green'
-          else if(date=='7')
-           color = 'error'
-          return color 
+          if (date == '6')
+            color = 'green'
+          else if (date == '7')
+            color = 'error'
+          return color
+        },       
+        getDate(date) {
+          // return moment(1541411221345).format('YYYY-MM-DD')
+          return date.toDate().getDate()
+          // return moment(date).format('YYYYMMDD');
+          // return date.toDate().toISOString()
+          // return new Date().getDate();
+          return new Date(date.seconds * 1000).toJSON().slice(0, 10).replace(/-/g, '-')
         },
         destory(id, idx) {
           db.collection("spends").doc(id).delete().then(() => {
@@ -259,11 +249,11 @@
         spends: [],
         email: 'mkdodos@gmail.com',
         password: '',
-        date:'',
+        date: '',
         title: '',
         amt: '',
         isLogin: true,
-        color:'error'
+        color: 'error'
 
       }
     })
