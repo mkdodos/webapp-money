@@ -10,6 +10,10 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
 
+  <!-- <link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+/> -->
 
 
   <title>W</title>
@@ -55,9 +59,12 @@
 
         <v-card v-if="isLogin" elevation="2">
 
-          <v-card-title>Cafe Badilico</v-card-title>
+          <!-- <v-card-title>Cafe Badilico</v-card-title> -->
           <v-card-text>
             <v-form v-if="isLogin">
+
+              <v-text-field label="日期" v-model="date">
+              </v-text-field>
               <v-text-field label="項目" v-model="title">
               </v-text-field>
               <v-text-field label="金額" v-model="amt" type="number">
@@ -87,6 +94,7 @@
               <template v-slot:default>
                 <thead>
                   <tr>
+                    <th>日期</th>
                     <th>項目</th>
                     <th>金額</th>
                     <th>id</th>
@@ -94,9 +102,16 @@
                 </thead>
                 <tbody>
                   <tr v-for="(obj,idx) in spends">
+                    <td>
+                      <v-badge :color="getColor(obj.date)" :content=obj.date>
+
+                      </v-badge>
+                    </td>
                     <td>{{obj.title}}</td>
                     <td>{{obj.amt}}</td>
-                    <td @click="destory(obj.id,idx)">刪除</td>
+                    <td @click="destory(obj.id,idx)">
+                      <v-icon>mdi-delete-outline</v-icon>
+                    </td>
                   </tr>
                 </tbody>
               </template>
@@ -156,31 +171,41 @@
       el: '#app',
       vuetify: new Vuetify(),
       methods: {
-        destory(id,idx) {
+        getColor(date){
+          let color = 'blue-grey'
+          if(date=='6')
+           color = 'green'
+          else if(date=='7')
+           color = 'error'
+          return color 
+        },
+        destory(id, idx) {
           db.collection("spends").doc(id).delete().then(() => {
             console.log("Document successfully deleted!");
             this.spends.splice(idx, 1);
           }).catch((error) => {
             console.error("Error removing document: ", error);
           });
-          
+
         },
         create() {
-          
+
           db.collection("spends").add({
+            date: this.date,
             title: this.title,
             amt: this.amt
-          }).then(doc=>{
+          }).then(doc => {
             let obj = {
-            title: this.title,
-            amt: this.amt,
-            id: doc.id
-          }
-          this.title = ""
-          this.amt = ""
-          this.spends.unshift(obj)
+              date: this.date,
+              title: this.title,
+              amt: this.amt,
+              id: doc.id
+            }
+            this.title = ""
+            this.amt = ""
+            this.spends.unshift(obj)
           })
-          
+
           // this.read()
         },
         logout() {
@@ -228,15 +253,17 @@
         }
       },
       mounted() {
-        // this.read()
+        this.read()
       },
       data: {
         spends: [],
         email: 'mkdodos@gmail.com',
         password: '123456',
+        date: '',
         title: '',
         amt: '',
-        isLogin: false
+        isLogin: true,
+        color:'error'
 
       }
     })
