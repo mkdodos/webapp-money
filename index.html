@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+
+
+
+  <title>W</title>
+
+
+  <style>
+    .v-data-table>.v-data-table__wrapper>table>thead>tr>th,
+    .v-data-table>.v-data-table__wrapper>table>tbody>tr>td {
+      font-size: 1.1em !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <v-app>
+
+
+      <!-- <div class="container z-depth-1"> -->
+      <div class="container ">
+
+        <v-toolbar dark>
+          <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+          <v-toolbar-title>Vuetify</v-toolbar-title>
+
+          <v-spacer></v-spacer>
+
+          <v-btn icon>
+            <v-icon>mdi-export</v-icon>
+          </v-btn>
+
+
+          <v-btn v-if="isLogin" class="btn  yellow darken-2 z-depth-0" @click.prevent="logout">Logout</v-btn>
+
+
+
+        </v-toolbar>
+
+        <v-divider></v-divider>
+
+
+        <v-card v-if="isLogin" elevation="2">
+
+          <v-card-title>Cafe Badilico</v-card-title>
+          <v-card-text>
+            <v-form v-if="isLogin">
+              <v-text-field label="項目" v-model="title">
+              </v-text-field>
+              <v-text-field label="金額" v-model="amt" type="number">
+              </v-text-field>
+              <v-btn class="teal white--text" @click="create">儲存</v-btn>
+            </v-form>
+          </v-card-text>
+
+        </v-card>
+
+        <v-form v-if="!isLogin">
+          <v-text-field label="Email" v-model="email" type="email">
+          </v-text-field>
+          <v-text-field label="Password" v-model="password" type="password">
+          </v-text-field>
+          <v-btn @click="login">登入</v-btn>
+        </v-form>
+
+
+        <v-row>
+          <v-col></v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <v-simple-table v-if="isLogin">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>金額</th>
+                    <th>id</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(obj,idx) in spends">
+                    <td>{{obj.title}}</td>
+                    <td>{{obj.amt}}</td>
+                    <td @click="destory(obj.id,idx)">刪除</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-col>
+        </v-row>
+
+
+
+
+
+
+
+
+      </div>
+
+
+    </v-app>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-auth.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-firestore.js"></script>
+  <script>
+    var config = {
+
+      apiKey: "AIzaSyDE0_fNOH_DJGCm8mH71Ia1uJ9XwLqb6Fg",
+      authDomain: "wedding-64c7a.firebaseapp.com",
+      projectId: "wedding-64c7a",
+    };
+    firebase.initializeApp(config);
+
+    // make auth and firestore references
+
+
+
+
+
+
+
+    const db = firebase.firestore();
+
+
+    db.settings({ timestampsInSnapshots: true });
+
+
+
+
+
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      methods: {
+        destory(id,idx) {
+          db.collection("spends").doc(id).delete().then(() => {
+            console.log("Document successfully deleted!");
+            this.spends.splice(idx, 1);
+          }).catch((error) => {
+            console.error("Error removing document: ", error);
+          });
+          
+        },
+        create() {
+          
+          db.collection("spends").add({
+            title: this.title,
+            amt: this.amt
+          }).then(doc=>{
+            let obj = {
+            title: this.title,
+            amt: this.amt,
+            id: doc.id
+          }
+          this.title = ""
+          this.amt = ""
+          this.spends.unshift(obj)
+          })
+          
+          // this.read()
+        },
+        logout() {
+          firebase.auth().signOut()
+          this.desserts = [];
+          this.isLogin = false
+          this.email = ""
+          this.password = ""
+        },
+        login() {
+          const email = this.email
+          const password = this.password
+          console.log(email)
+          console.log(password)
+          firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(() => {
+              this.read()
+              this.isLogin = true
+              var user = firebase.auth().currentUser;
+
+              if (user) {
+                console.log(user.email);
+              } else {
+                console.log("no");
+              }
+
+            })
+            .catch((error) => {
+              console.log(error.message);
+            });
+
+        },
+        read() {
+          this.spends = [];
+          // db.collection('spend').orderBy("amt","desc").limit(3).get().then(snapshot => {
+          db.collection('spends').get().then(snapshot => {
+            let rows = snapshot.docs;
+            rows.forEach(element => {
+              let row = element.data();
+              row.id = element.id;
+              this.spends.push(row)
+            });
+            console.log(rows)
+          })
+        }
+      },
+      mounted() {
+        // this.read()
+      },
+      data: {
+        spends: [],
+        email: 'mkdodos@gmail.com',
+        password: '123456',
+        title: '',
+        amt: '',
+        isLogin: false
+
+      }
+    })
+  </script>
+
+</body>
+
+</html>
