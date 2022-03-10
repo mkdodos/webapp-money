@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Document</title>
+</head>
+<body>
+    <script type="importmap">
+        {
+          "imports": {
+            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+          }
+        }
+      </script>
+      <div id="app">{{ message }}</div>
+
+    <script type="module">
+        import {foo,spends} from "./db.js"
+        import { createApp } from 'vue'
+      
+        
+    
+        
+        
+       
+
+    
+    console.log(foo.A)
+
+
+        createApp({
+          data() {
+            return {
+              message: foo.A
+            }
+          }
+        }).mount('#app')
+      </script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script> -->
+    <!-- <script>
+        new Vue({
+           el:'#app',
+            mounted(){
+                console.log('abc123')
+            }
+        }) 
+    </script> -->
+    <script type="module">
+        // console.log(db2)
+        // import db from "./db.js"
+       
+        
+    </script>
+
+
+</body>
+</html>
+

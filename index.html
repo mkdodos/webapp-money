@@ -63,7 +63,7 @@
           <v-card-text>
             <v-form v-if="isLogin">
 
-              <v-text-field label="日期" v-model="date">
+              <v-text-field label="日期" v-model="date" type="date">
               </v-text-field>
               <v-text-field label="項目" v-model="title">
               </v-text-field>
@@ -162,12 +162,13 @@
           return color
         },       
         getDate(date) {
-          // return moment(1541411221345).format('YYYY-MM-DD')
           return date.toDate().getDate()
+          // return moment(1541411221345).format('YYYY-MM-DD')
+          // return date.toDate().getDate()
           // return moment(date).format('YYYYMMDD');
           // return date.toDate().toISOString()
           // return new Date().getDate();
-          return new Date(date.seconds * 1000).toJSON().slice(0, 10).replace(/-/g, '-')
+          //return new Date(date.seconds * 1000).toJSON().slice(0, 10).replace(/-/g, '-')
         },
         destory(id, idx) {
           db.collection("spends").doc(id).delete().then(() => {
@@ -179,14 +180,15 @@
 
         },
         create() {
-
+          // console.log(firebase.firestore.Timestamp.fromDate(this.date))
+          // return  
           db.collection("spends").add({
-            date: this.date,
+            date: new Date(),
             title: this.title,
             amt: this.amt
           }).then(doc => {
             let obj = {
-              date: this.date,
+              date: new Date(),
               title: this.title,
               amt: this.amt,
               id: doc.id
